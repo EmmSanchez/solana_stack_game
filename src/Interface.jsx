@@ -1,9 +1,10 @@
 import { useGameStore } from "./store/useGame";
 import data from "./fakeData.json";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ChartIcon,
   HomeIcon,
+  LogoutIcon,
   Restart,
   ShareIcon,
   TelegramIcon,
@@ -11,6 +12,9 @@ import {
   WalletIcon,
   XIcon,
 } from "./assets/icons/interfaceIcons";
+// import { Connection, clusterApiUrl, PublicKey } from "@solana/web3.js";
+
+// const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
 
 function Interface() {
   const mode = useGameStore((state) => state.mode);
@@ -22,6 +26,7 @@ function Interface() {
   const perfectCount = useGameStore((state) => state.perfectCount);
 
   const [users, setUsers] = useState(data);
+  const [wallet, setWallet] = useState(null);
 
   const handleStart = () => {
     start();
@@ -39,6 +44,31 @@ function Interface() {
     home();
   };
 
+  const handleConnectWallet = async () => {
+    try {
+      const response = await window.solana.connect();
+      const publicKey = response.publicKey.toString();
+      console.log("Connected with publicKey:", publicKey);
+      setWallet(publicKey);
+      return publicKey;
+    } catch (error) {
+      console.error("Connection to Phantom wallet failed:", error);
+    }
+  };
+
+  const handleDisconnectWallet = async () => {
+    await window.solana.disconnect();
+    setWallet(null);
+  };
+
+  useEffect(() => {
+    if (window.solana && window.solana.isPhantom) {
+      console.log("Phantom wallet found!");
+    } else {
+      console.log("Phantom wallet not found. Please install it.");
+    }
+  }, []);
+
   return (
     <>
       {mode === "ready" && (
@@ -47,19 +77,44 @@ function Interface() {
           className="fixed flex justify-center text-center top-0 left-0 size-full hover:cursor-pointer"
         >
           <div className="absolute top-[5%] text-[8vw] text-white font-bold">
-            <p>Stack Game</p>
+            <p>Shit Tower Game</p>
             <p className="text-[2vw] font-medium">Touch to Start</p>
           </div>
 
-          <div className="absolute bottom-[4%] flex flex-col justify-center items-center gap-[1.6vw] text-white">
+          <div className="absolute bottom-[4%] flex flex-col justify-center items-center gap-[1.6vw] text-white text-[1vw]">
             <div className="flex gap-[1vw]">
-              <button
-                onClick={(e) => e.stopPropagation()}
-                className="flex gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
-              >
-                <p>Connect Wallet</p>
-                <WalletIcon />
-              </button>
+              {!wallet ? (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleConnectWallet();
+                    }}
+                    className="flex items-center justify-center gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
+                  >
+                    <p>Connect Wallet</p>
+                    <WalletIcon />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDisconnectWallet();
+                    }}
+                    className="flex items-center justify-center gap-[.8vw] bg-[#9886E5] hover:bg-[#9886E5]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
+                  >
+                    <p>
+                      Disconnect{" "}
+                      <span className="font-bold">
+                        {wallet.slice(0, 4)}...{wallet.slice(-4)}
+                      </span>
+                    </p>
+                    <WalletIcon />
+                  </button>
+                </>
+              )}
               <button
                 onClick={(e) => e.stopPropagation()}
                 className="flex gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
@@ -150,27 +205,73 @@ function Interface() {
 
             {/* Current User */}
             <div className="absolute flex z-20 bottom-[2%] justify-center w-full h-[10%]">
-              <div className="w-[95%] flex justify-around items-center text-white text-[1vw] font-semibold rounded-[1vw] bg-[#040D12]/20 backdrop-blur-[1vw] border-solid border-[.1vw] border-[#5C8374]">
-                <p>40</p>
-                <p>cosmic_ray</p>
-                <p className="text-[#00FFB0]">5200</p>
-              </div>
+              {wallet ? (
+                <>
+                  <div className="w-[95%] flex justify-around items-center text-white text-[1vw] font-semibold rounded-[1vw] bg-[#040D12]/20 backdrop-blur-[1vw] border-solid border-[.1vw] border-[#5C8374]">
+                    <p>40</p>
+                    <p>cosmic_ray</p>
+                    <p className="text-[#00FFB0]">5200</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleConnectWallet();
+                    }}
+                    className="w-[95%] flex justify-around items-center text-white text-[1vw] font-semibold rounded-[1vw] bg-[#040D12]/20 hover:underline underline-offset-4 hover:cursor-pointer backdrop-blur-[1vw] border-solid border-[.1vw] border-[#5C8374] transition-all"
+                  >
+                    <p>Connect Wallet To Save Score</p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
           <div className="absolute flex flex-col items-center gap-[1vw] top-[5%] right-[5%] w-[25%] h-[90%]">
             <div className="w-full h-[8%] flex justify-between items-center text-[#3DD2B4]">
-              <div className="flex gap-[.6vw] justify-center items-center font-semibold">
-                <UserIcon className="size-[1.4vw]" />
-                cosmic_ray
-              </div>
-              <div className="flex items-center gap-[.2vw]">
-                <HomeIcon
-                  onClick={handleGoToHome}
-                  className="size-[3vw] hover:bg-[#040D12] p-[.8vw] rounded-[.4vw] hover:cursor-pointer transition ease-in-out"
-                />
-                <WalletIcon className="size-[3vw] hover:bg-[#040D12] p-[.8vw] rounded-[.4vw] hover:cursor-pointer transition ease-in-out" />
-              </div>
+              {wallet ? (
+                <>
+                  <div className="flex gap-[.6vw] text-[1vw] justify-center items-center font-semibold">
+                    <UserIcon className="size-[1.4vw]" />
+                    {wallet.slice(0, 4)}...{wallet.slice(-4)}
+                  </div>
+                  <div className="flex items-center gap-[.2vw]">
+                    <HomeIcon
+                      onClick={handleGoToHome}
+                      className="size-[3vw] hover:bg-[#040D12] p-[.8vw] rounded-[.4vw] hover:cursor-pointer transition ease-in-out"
+                    />
+                    <LogoutIcon
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDisconnectWallet();
+                      }}
+                      className="size-[3vw] hover:bg-[#040D12] p-[.8vw] rounded-[.4vw] hover:cursor-pointer transition ease-in-out"
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex gap-[.6vw] text-[1vw] justify-center items-center font-semibold">
+                    <UserIcon className="size-[1.4vw]" />
+                    invited shitcoiner
+                  </div>
+                  <div className="flex items-center gap-[.2vw]">
+                    <HomeIcon
+                      onClick={handleGoToHome}
+                      className="size-[3vw] hover:bg-[#040D12] p-[.8vw] rounded-[.4vw] hover:cursor-pointer transition ease-in-out"
+                    />
+                    <WalletIcon
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleConnectWallet();
+                      }}
+                      className="size-[3vw] hover:bg-[#040D12] p-[.8vw] rounded-[.4vw] hover:cursor-pointer transition ease-in-out"
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="relative flex flex-col justify-center items-center bg-[#040D12] w-full h-[20%] rounded-[1vw] overflow-hidden">
@@ -200,7 +301,7 @@ function Interface() {
                 <ShareIcon className="rotate-180 size-[1.4vw]" />
                 Share Score
               </button> */}
-              <div className="text-white">
+              <div className="text-white text-[1vw]">
                 <p>Logo</p>
               </div>
 
