@@ -69,7 +69,13 @@ function Interface() {
 
     const fetchPlayer = async () => {
       const res = await fetch(
-        "https://solanastackgameapi-production.up.railway.app/ranking?limit=10&offset=0"
+        "https://solanastackgameapi-production.up.railway.app/ranking?limit=10&offset=0",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
       const players = await res.json();
       console.log(players);
