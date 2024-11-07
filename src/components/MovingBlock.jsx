@@ -139,7 +139,6 @@ export function MovingBlock(props) {
 
     // Restart clock to 0 to change block position to default
     clock.elapsedTime = 4.8;
-    console.log(perfectCount);
   }, [mode]);
 
   return (

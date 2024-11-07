@@ -16,6 +16,20 @@ import {
 
 // const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
 
+const insertPlayerByScore = (users, newPlayer) => {
+  // Find score lower than actual score
+  const index = users.findIndex((user) => user.max_score < newPlayer.max_score);
+
+  // If is -1, push it to the last place
+  if (index === -1) {
+    users.push(newPlayer);
+  } else {
+    users.splice(index, 0, newPlayer);
+  }
+
+  return users;
+};
+
 function Interface() {
   const mode = useGameStore((state) => state.mode);
   const start = useGameStore((state) => state.start);
@@ -25,8 +39,12 @@ function Interface() {
   const home = useGameStore((state) => state.home);
   const perfectCount = useGameStore((state) => state.perfectCount);
 
+  const userInfo = useGameStore((state) => state.userInfo);
+  const setUserInfo = useGameStore((state) => state.setUserInfo);
+
   const [users, setUsers] = useState(data);
   const [wallet, setWallet] = useState(null);
+  const [userRank, setUserRank] = useState(null);
 
   const handleStart = () => {
     start();
@@ -45,11 +63,90 @@ function Interface() {
   };
 
   const handleConnectWallet = async () => {
+    const verifyWallet = async (address) => {
+      const res = await fetch(
+        `https://solanastackgameapi-production.up.railway.app/player?id=${address}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const [data] = await res.json();
+
+      if (!data) {
+        return null;
+      }
+
+      setUserInfo(data);
+      return data;
+    };
+
+    const registerWallet = async (address, score = 0) => {
+      const res = await fetch(
+        "https://solanastackgameapi-production.up.railway.app/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: address,
+            score: score,
+          }),
+        }
+      );
+
+      const { success } = await res.json();
+
+      return success;
+    };
+
     try {
       const response = await window.solana.connect();
       const publicKey = response.publicKey.toString();
-      setWallet(publicKey);
-      return publicKey;
+
+      // Check if is already registered
+      const res = await verifyWallet(publicKey);
+      if (res) {
+        setWallet(publicKey);
+
+        // Check if the new result is higher than max_score
+        if (score > userInfo.max_score) {
+          updateMaxScore(userInfo.address, score);
+          const newUserInfo = {
+            address: userInfo.address,
+            max_score: score,
+          };
+          setUserInfo(newUserInfo);
+        }
+
+        const index = users.findIndex((user) => user.address === publicKey);
+        const fixedIndex = index + 1;
+        setUserRank(fixedIndex);
+      } else if (!res) {
+        // Register new wallet
+        const res = await registerWallet(publicKey, score);
+        if (res) {
+          setWallet(publicKey);
+          const newUserInfo = {
+            address: publicKey,
+            max_score: score,
+          };
+          setUserInfo(newUserInfo);
+
+          // Calculate new rank
+          const newUsers = insertPlayerByScore(users, newUserInfo);
+          setUsers(newUsers);
+
+          const index = users.findIndex((user) => user.address === publicKey);
+          const fixedIndex = index + 2;
+          setUserRank(fixedIndex);
+        }
+      }
+
+      return;
     } catch (error) {
       console.error("Connection to Phantom wallet failed:", error);
     }
@@ -58,18 +155,14 @@ function Interface() {
   const handleDisconnectWallet = async () => {
     await window.solana.disconnect();
     setWallet(null);
+    setUserInfo(null);
+    setUserRank(null);
   };
 
   useEffect(() => {
-    if (window.solana && window.solana.isPhantom) {
-      console.log("Phantom wallet found!");
-    } else {
-      console.log("Phantom wallet not found. Please install it.");
-    }
-
-    const fetchPlayer = async () => {
+    const fetchRanking = async () => {
       const res = await fetch(
-        "https://solanastackgameapi-production.up.railway.app/ranking?limit=10&offset=0",
+        "https://solanastackgameapi-production.up.railway.app/ranking?limit=0&offset=0",
         {
           method: "GET",
           headers: {
@@ -78,11 +171,45 @@ function Interface() {
         }
       );
       const players = await res.json();
-      console.log(players);
+      setUsers(players);
     };
 
-    fetchPlayer();
+    fetchRanking();
   }, []);
+
+  const updateMaxScore = async (address, newScore) => {
+    console.log("Max_score is higher");
+    const res = await fetch(
+      "https://solanastackgameapi-production.up.railway.app/player/update-score",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: address,
+          score: newScore,
+        }),
+      }
+    );
+
+    const response = await res.json();
+  };
+
+  useEffect(() => {
+    if (mode === "ended") {
+      if (wallet) {
+        if (score > userInfo.max_score) {
+          updateMaxScore(userInfo.address, score);
+          const newUserInfo = {
+            address: userInfo.address,
+            max_score: score,
+          };
+          setUserInfo(newUserInfo);
+        }
+      }
+    }
+  }, [mode]);
 
   return (
     <>
@@ -132,7 +259,7 @@ function Interface() {
               )}
               <button
                 onClick={(e) => e.stopPropagation()}
-                className="flex gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
+                className="flex items-center gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
               >
                 <p>Leaderboard</p>
                 <ChartIcon />
@@ -199,17 +326,17 @@ function Interface() {
 
                 <div className="table-row-group rounded-b-[1.5vw]">
                   {users &&
-                    users.map((user, index) => {
+                    users.slice(0, 15).map((user, index) => {
                       return (
                         <div key={index} className="table-row">
                           <div className="table-cell py-[.4vw] px-[.8vw] text-zinc-300 text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
-                            {user.rank}
+                            {index + 1}
                           </div>
                           <div className="table-cell py-[.4vw] px-[.8vw] text-zinc-300 text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
-                            {user.username}
+                            {user.address.slice(0, 16)}...
                           </div>
                           <div className="table-cell py-[.4vw] px-[.8vw] text-[#00FFB0] text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
-                            {user.score}
+                            {user.max_score}
                           </div>
                         </div>
                       );
@@ -220,37 +347,35 @@ function Interface() {
 
             {/* Current User */}
             <div className="absolute flex z-20 bottom-[2%] justify-center w-full h-[10%]">
-              {wallet ? (
-                <>
-                  <div className="w-[95%] flex justify-around items-center text-white text-[1vw] font-semibold rounded-[1vw] bg-[#040D12]/20 backdrop-blur-[1vw] border-solid border-[.1vw] border-[#5C8374]">
-                    <p>40</p>
-                    <p>cosmic_ray</p>
-                    <p className="text-[#00FFB0]">5200</p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleConnectWallet();
-                    }}
-                    className="w-[95%] flex justify-around items-center text-white text-[1vw] font-semibold rounded-[1vw] bg-[#040D12]/20 hover:underline underline-offset-4 hover:cursor-pointer backdrop-blur-[1vw] border-solid border-[.1vw] border-[#5C8374] transition-all"
-                  >
-                    <p>Connect Wallet To Save Score</p>
-                  </div>
-                </>
-              )}
+              <>
+                <div className="w-[95%] flex justify-around items-center text-white text-[1vw] font-semibold rounded-[1vw] bg-[#040D12]/20 backdrop-blur-[1vw] border-solid border-[.1vw] border-[#5C8374]">
+                  <p>{userRank ? <>{userRank}</> : <>#</>}</p>
+                  <p>
+                    {userInfo ? (
+                      <>
+                        {userInfo.address.slice(0, 4)}...
+                        {userInfo.address.slice(-4)}
+                      </>
+                    ) : (
+                      <>invited</>
+                    )}
+                  </p>
+                  <p className="text-[#00FFB0]">
+                    {userInfo ? <>{userInfo.max_score}</> : <>{score}</>}
+                  </p>
+                </div>
+              </>
             </div>
           </div>
 
           <div className="absolute flex flex-col items-center gap-[1vw] top-[5%] right-[5%] w-[25%] h-[90%]">
             <div className="w-full h-[8%] flex justify-between items-center text-[#3DD2B4]">
-              {wallet ? (
+              {userInfo ? (
                 <>
                   <div className="flex gap-[.6vw] text-[1vw] justify-center items-center font-semibold">
                     <UserIcon className="size-[1.4vw]" />
-                    {wallet.slice(0, 4)}...{wallet.slice(-4)}
+                    {userInfo.address.slice(0, 4)}...
+                    {userInfo.address.slice(-4)}
                   </div>
                   <div className="flex items-center gap-[.2vw]">
                     <HomeIcon
@@ -270,7 +395,7 @@ function Interface() {
                 <>
                   <div className="flex gap-[.6vw] text-[1vw] justify-center items-center font-semibold">
                     <UserIcon className="size-[1.4vw]" />
-                    invited shitcoiner
+                    invited
                   </div>
                   <div className="flex items-center gap-[.2vw]">
                     <HomeIcon
@@ -291,7 +416,7 @@ function Interface() {
 
             <div className="relative flex flex-col justify-center items-center bg-[#040D12] w-full h-[20%] rounded-[1vw] overflow-hidden">
               <p className="text-[4vw] font-extrabold leading-[4vw] text-[#3DD2B4]">
-                60
+                {userInfo ? <>{userInfo.max_score}</> : <>{score}</>}
               </p>
               <p className="text-[1.5vw] font-medium text-gray-400">
                 Highest Score

@@ -18,6 +18,10 @@ const MODES = {
 
 export const useGameStore = create((set) => {
   return {
+    userInfo: null,
+    setUserInfo: (value) => {
+      set({ userInfo: value });
+    },
     speed: INITAL_SPEED,
     score: INITAL_SCORE,
     color: RANDOM_COLOR,
