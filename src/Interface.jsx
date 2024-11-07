@@ -48,7 +48,6 @@ function Interface() {
     try {
       const response = await window.solana.connect();
       const publicKey = response.publicKey.toString();
-      console.log("Connected with publicKey:", publicKey);
       setWallet(publicKey);
       return publicKey;
     } catch (error) {
@@ -67,6 +66,16 @@ function Interface() {
     } else {
       console.log("Phantom wallet not found. Please install it.");
     }
+
+    const fetchPlayer = async () => {
+      const res = await fetch(
+        "https://solanastackgameapi-production.up.railway.app/ranking?limit=10&offset=0"
+      );
+      const players = await res.json();
+      console.log(players);
+    };
+
+    fetchPlayer();
   }, []);
 
   return (
