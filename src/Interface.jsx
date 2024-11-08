@@ -16,20 +16,6 @@ import {
 
 // const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
 
-const insertPlayerByScore = (users, newPlayer) => {
-  // Find score lower than actual score
-  const index = users.findIndex((user) => user.max_score < newPlayer.max_score);
-
-  // If is -1, push it to the last place
-  if (index === -1) {
-    users.push(newPlayer);
-  } else {
-    users.splice(index, 0, newPlayer);
-  }
-
-  return users;
-};
-
 function Interface() {
   const mode = useGameStore((state) => state.mode);
   const start = useGameStore((state) => state.start);
@@ -43,8 +29,6 @@ function Interface() {
   const setUserInfo = useGameStore((state) => state.setUserInfo);
 
   const [users, setUsers] = useState(data);
-  const [wallet, setWallet] = useState(null);
-  const [userRank, setUserRank] = useState(null);
 
   const handleStart = () => {
     start();
@@ -79,7 +63,16 @@ function Interface() {
         return null;
       }
 
-      setUserInfo(data);
+      if (users) {
+        const index = users.findIndex((user) => user.address === address) + 1;
+        const newInfo = {
+          rank: index,
+          address: data.address,
+          max_score: data.max_score,
+        };
+        setUserInfo(newInfo);
+      }
+
       return data;
     };
 
@@ -100,7 +93,13 @@ function Interface() {
 
       const { success } = await res.json();
 
-      return success;
+      if (success) {
+        const newUserInfo = {
+          address: address,
+          max_score: score,
+        };
+        setUserInfo(newUserInfo);
+      }
     };
 
     try {
@@ -110,8 +109,6 @@ function Interface() {
       // Check if is already registered
       const res = await verifyWallet(publicKey);
       if (res) {
-        setWallet(publicKey);
-
         // Check if the new result is higher than max_score
         if (score > userInfo.max_score) {
           updateMaxScore(userInfo.address, score);
@@ -121,29 +118,9 @@ function Interface() {
           };
           setUserInfo(newUserInfo);
         }
-
-        const index = users.findIndex((user) => user.address === publicKey);
-        const fixedIndex = index + 1;
-        setUserRank(fixedIndex);
       } else if (!res) {
         // Register new wallet
         const res = await registerWallet(publicKey, score);
-        if (res) {
-          setWallet(publicKey);
-          const newUserInfo = {
-            address: publicKey,
-            max_score: score,
-          };
-          setUserInfo(newUserInfo);
-
-          // Calculate new rank
-          const newUsers = insertPlayerByScore(users, newUserInfo);
-          setUsers(newUsers);
-
-          const index = users.findIndex((user) => user.address === publicKey);
-          const fixedIndex = index + 2;
-          setUserRank(fixedIndex);
-        }
       }
 
       return;
@@ -154,9 +131,13 @@ function Interface() {
 
   const handleDisconnectWallet = async () => {
     await window.solana.disconnect();
-    setWallet(null);
-    setUserInfo(null);
-    setUserRank(null);
+
+    const INITIAL_USER_INFO = {
+      rank: null,
+      address: "invited",
+      max_score: 0,
+    };
+    setUserInfo(INITIAL_USER_INFO);
   };
 
   useEffect(() => {
@@ -171,14 +152,18 @@ function Interface() {
         }
       );
       const players = await res.json();
-      setUsers(players);
+      const mappedPlayers = players.map((player, index) => ({
+        rank: index + 1,
+        address: player.address,
+        max_score: player.max_score,
+      }));
+      setUsers(mappedPlayers);
     };
 
     fetchRanking();
   }, []);
 
   const updateMaxScore = async (address, newScore) => {
-    console.log("Max_score is higher");
     const res = await fetch(
       "https://solanastackgameapi-production.up.railway.app/player/update-score",
       {
@@ -197,10 +182,14 @@ function Interface() {
   };
 
   useEffect(() => {
+    const updateScore = async () => {
+      await updateMaxScore(userInfo.address, score);
+    };
+
     if (mode === "ended") {
-      if (wallet) {
+      if (userInfo) {
         if (score > userInfo.max_score) {
-          updateMaxScore(userInfo.address, score);
+          updateScore();
           const newUserInfo = {
             address: userInfo.address,
             max_score: score,
@@ -218,14 +207,23 @@ function Interface() {
           onClick={handleStart}
           className="fixed flex justify-center text-center top-0 left-0 size-full hover:cursor-pointer"
         >
-          <div className="absolute top-[5%] text-[8vw] text-white font-bold">
-            <p>Shit Tower Game</p>
-            <p className="text-[2vw] font-medium">Touch to Start</p>
+          <div className="absolute top-[5%] text-[6vw] text-cyan-50 font-bold">
+            <p>SkyStacks</p>
+
+            <div className="flex justify-center">
+              <p className="text-[1vw] font-medium w-fit bg-cyan-600 px-[.6vw] py-[.4vw] rounded-[.4vw]">
+                Top players = 🎁 airdrops!
+              </p>
+            </div>
+
+            <p className="mt-[12vw] text-[1.6vw] font-medium animate-pulse">
+              Touch to Start
+            </p>
           </div>
 
           <div className="absolute bottom-[4%] flex flex-col justify-center items-center gap-[1.6vw] text-white text-[1vw]">
             <div className="flex gap-[1vw]">
-              {!wallet ? (
+              {!userInfo || userInfo.address === "invited" ? (
                 <>
                   <button
                     onClick={(e) => {
@@ -235,7 +233,7 @@ function Interface() {
                     className="flex items-center justify-center gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
                   >
                     <p>Connect Wallet</p>
-                    <WalletIcon />
+                    <WalletIcon className="size-[1.5vw]" />
                   </button>
                 </>
               ) : (
@@ -250,10 +248,11 @@ function Interface() {
                     <p>
                       Disconnect{" "}
                       <span className="font-bold">
-                        {wallet.slice(0, 4)}...{wallet.slice(-4)}
+                        {userInfo.address.slice(0, 4)}...
+                        {userInfo.address.slice(-4)}
                       </span>
                     </p>
-                    <WalletIcon />
+                    <LogoutIcon className="size-[1.5vw]" />
                   </button>
                 </>
               )}
@@ -262,7 +261,7 @@ function Interface() {
                 className="flex items-center gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
               >
                 <p>Leaderboard</p>
-                <ChartIcon />
+                <ChartIcon className="size-[1.5vw]" />
               </button>
             </div>
             <div className="flex gap-[1vw] text-gray-200">
@@ -330,7 +329,7 @@ function Interface() {
                       return (
                         <div key={index} className="table-row">
                           <div className="table-cell py-[.4vw] px-[.8vw] text-zinc-300 text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
-                            {index + 1}
+                            {user.rank}
                           </div>
                           <div className="table-cell py-[.4vw] px-[.8vw] text-zinc-300 text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
                             {user.address.slice(0, 16)}...
@@ -349,9 +348,15 @@ function Interface() {
             <div className="absolute flex z-20 bottom-[2%] justify-center w-full h-[10%]">
               <>
                 <div className="w-[95%] flex justify-around items-center text-white text-[1vw] font-semibold rounded-[1vw] bg-[#040D12]/20 backdrop-blur-[1vw] border-solid border-[.1vw] border-[#5C8374]">
-                  <p>{userRank ? <>{userRank}</> : <>#</>}</p>
                   <p>
-                    {userInfo ? (
+                    {userInfo && userInfo.address !== "invited" ? (
+                      <>{userInfo.rank}</>
+                    ) : (
+                      <>#</>
+                    )}
+                  </p>
+                  <p>
+                    {userInfo && userInfo.address !== "invited" ? (
                       <>
                         {userInfo.address.slice(0, 4)}...
                         {userInfo.address.slice(-4)}
@@ -361,7 +366,11 @@ function Interface() {
                     )}
                   </p>
                   <p className="text-[#00FFB0]">
-                    {userInfo ? <>{userInfo.max_score}</> : <>{score}</>}
+                    {userInfo && userInfo.address !== "invited" ? (
+                      <>{userInfo.max_score}</>
+                    ) : (
+                      <>{score}</>
+                    )}
                   </p>
                 </div>
               </>
@@ -370,7 +379,7 @@ function Interface() {
 
           <div className="absolute flex flex-col items-center gap-[1vw] top-[5%] right-[5%] w-[25%] h-[90%]">
             <div className="w-full h-[8%] flex justify-between items-center text-[#3DD2B4]">
-              {userInfo ? (
+              {userInfo && userInfo.address !== "invited" ? (
                 <>
                   <div className="flex gap-[.6vw] text-[1vw] justify-center items-center font-semibold">
                     <UserIcon className="size-[1.4vw]" />
@@ -416,7 +425,11 @@ function Interface() {
 
             <div className="relative flex flex-col justify-center items-center bg-[#040D12] w-full h-[20%] rounded-[1vw] overflow-hidden">
               <p className="text-[4vw] font-extrabold leading-[4vw] text-[#3DD2B4]">
-                {userInfo ? <>{userInfo.max_score}</> : <>{score}</>}
+                {userInfo && userInfo.address !== "invited" ? (
+                  <>{userInfo.max_score}</>
+                ) : (
+                  <>{score}</>
+                )}
               </p>
               <p className="text-[1.5vw] font-medium text-gray-400">
                 Highest Score
@@ -441,8 +454,8 @@ function Interface() {
                 <ShareIcon className="rotate-180 size-[1.4vw]" />
                 Share Score
               </button> */}
-              <div className="text-white text-[1vw]">
-                <p>Logo</p>
+              <div className="text-white text-[1.6vw]">
+                <p>SkyStacks</p>
               </div>
 
               <div className="flex gap-[1vw] text-gray-200">

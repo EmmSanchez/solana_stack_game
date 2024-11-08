@@ -1,5 +1,10 @@
 import { create } from "zustand";
 
+const INITIAL_USER_INFO = {
+  rank: null,
+  address: "invited",
+  max_score: 0,
+};
 const INITAL_SPEED = 1;
 const INITAL_SCORE = 0;
 const INITIAL_BLOCK = {
@@ -18,7 +23,7 @@ const MODES = {
 
 export const useGameStore = create((set) => {
   return {
-    userInfo: null,
+    userInfo: INITIAL_USER_INFO,
     setUserInfo: (value) => {
       set({ userInfo: value });
     },

@@ -9,7 +9,9 @@ export default function Experience() {
     <>
       {/* <Perf position="top-left" /> */}
 
-      <Physics>
+      {/* <OrbitControls /> */}
+
+      <Physics debug>
         <Lights />
         <Level />
       </Physics>

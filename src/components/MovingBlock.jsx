@@ -2,12 +2,13 @@ import { useGameStore } from "../store/useGame.js";
 import { useRef, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { CuboidCollider, RigidBody } from "@react-three/rapier";
 import adjustBox from "../utils/adjustBox.js";
 import createResidueBlock from "../utils/createResidueBlock.js";
 
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 
-export function MovingBlock(props) {
+export function MovingBlock({ position, scale }) {
   const block = useRef();
 
   const blocks = useGameStore((state) => state.blocks);
@@ -27,6 +28,8 @@ export function MovingBlock(props) {
   const continuePlaying = useGameStore((state) => state.continuePlaying);
   const end = useGameStore((state) => state.end);
 
+  const colliderSize = [scale[0] / 2, scale[1] / 2, scale[2] / 2];
+
   /**
    * Movement
    */
@@ -34,16 +37,18 @@ export function MovingBlock(props) {
 
   useFrame((state, delta) => {
     if (mode === "playing") {
-      // To fix when is ended in 0 and restart
-      block.current.position.y = (score + 1) * 0.5;
-
-      const elapsedTime = state.clock.elapsedTime;
-
-      if (score % 2 === 0) {
-        block.current.position.x = Math.sin(elapsedTime * speed) * 6;
-      } else {
-        block.current.position.z = Math.sin(elapsedTime * speed) * 6;
-      }
+      // Coloca el bloque en la posición actual en el eje y
+      block.current.setNextKinematicTranslation({
+        x:
+          score % 2 === 0
+            ? Math.sin(state.clock.elapsedTime * speed) * 6
+            : block.current.translation().x,
+        y: (score + 1) * 0.5,
+        z:
+          score % 2 !== 0
+            ? Math.sin(state.clock.elapsedTime * speed) * 6
+            : block.current.translation().z,
+      });
     }
   });
 
@@ -52,102 +57,76 @@ export function MovingBlock(props) {
       const lastBlock = blocks[blocks.length - 1];
       const currentBlock = block.current;
 
-      if (score % 2 === 0) {
-        const { newBlock, meta } = adjustBox(
-          currentBlock,
-          lastBlock,
-          "x",
-          score,
-          color
-        );
+      const adjustAxis = score % 2 === 0 ? "x" : "z";
+      const { newBlock, meta } = adjustBox(
+        currentBlock,
+        lastBlock,
+        adjustAxis,
+        score,
+        color,
+        colliderSize
+      );
 
-        if (!newBlock) {
-          const finalBlock = {
-            position: currentBlock.position,
-            scale: currentBlock.scale,
-            color: currentBlock.material.color,
-          };
+      if (!newBlock) {
+        const currentBlockPosition = currentBlock.translation();
+        const newPosition = [
+          currentBlockPosition["x"],
+          currentBlockPosition["y"],
+          currentBlockPosition["z"],
+        ];
 
-          setResidual([...residual, finalBlock]);
-          return end();
-        }
+        const finalBlock = {
+          position: newPosition,
+          scale: scale,
+          color: new THREE.Color(`hsl(${(score - 1) * 14 + color}, 60%, 50%)`),
+        };
+        console.log(finalBlock);
 
-        if (meta.difference === 0) {
-          increasePerfectCount();
-        } else {
-          resetPerfectCount();
-        }
+        setResidual([...residual, finalBlock]);
+        return end();
+      }
 
-        const newResidualBlock = createResidueBlock(
-          currentBlock,
-          newBlock,
-          meta.difference,
-          "x",
-          score,
-          color
-        );
-
-        setBlocks([...blocks, newBlock]);
-
-        if (newResidualBlock) {
-          setResidual([...residual, newResidualBlock]);
-        }
+      if (meta.difference === 0) {
+        increasePerfectCount();
       } else {
-        const { newBlock, meta } = adjustBox(
-          currentBlock,
-          lastBlock,
-          "z",
-          score,
-          color
-        );
+        resetPerfectCount();
+      }
 
-        if (!newBlock) {
-          const finalBlock = {
-            position: currentBlock.position,
-            scale: currentBlock.scale,
-            color: currentBlock.material.color,
-          };
+      const newResidualBlock = createResidueBlock(
+        currentBlock,
+        newBlock,
+        meta.difference,
+        adjustAxis,
+        score,
+        color,
+        colliderSize
+      );
 
-          setResidual([...residual, finalBlock]);
-          return end();
-        }
+      setBlocks([...blocks, newBlock]);
 
-        if (meta.difference === 0) {
-          increasePerfectCount();
-        } else {
-          resetPerfectCount();
-        }
-
-        const newResidualBlock = createResidueBlock(
-          currentBlock,
-          newBlock,
-          meta.difference,
-          "z",
-          score,
-          color
-        );
-
-        setBlocks([...blocks, newBlock]);
-
-        if (newResidualBlock) {
-          setResidual([...residual, newResidualBlock]);
-        }
+      if (newResidualBlock) {
+        setResidual([...residual, newResidualBlock]);
       }
 
       continuePlaying();
     }
 
-    // Restart clock to 0 to change block position to default
     clock.elapsedTime = 4.8;
   }, [mode]);
 
   return (
-    <>
-      <mesh ref={block} geometry={boxGeometry} castShadow {...props}>
+    <RigidBody
+      ref={block}
+      type="kinematicPosition"
+      colliders={false}
+      position={position}
+    >
+      <mesh geometry={boxGeometry} castShadow receiveShadow scale={scale}>
         <meshStandardMaterial
           color={`hsl(${(score - 1) * 14 + color}, 60%, 50%)`}
         />
       </mesh>
-    </>
+      <CuboidCollider args={colliderSize} />
+    </RigidBody>
   );
 }

@@ -5,6 +5,7 @@ import { useGameStore } from "./store/useGame.js";
 import { BlocksTower } from "./components/BlocksTower.jsx";
 import { MovingBlock } from "./components/MovingBlock.jsx";
 import { ResidualBlock } from "./components/ResidualBlock.jsx";
+import { MaxScoreLine } from "./components/MaxScoreLine.jsx";
 
 export default function Level() {
   const blocks = useGameStore((state) => state.blocks);
@@ -13,6 +14,7 @@ export default function Level() {
   const residual = useGameStore((state) => state.residual);
   const setColor = useGameStore((state) => state.setColor);
   const perfectCount = useGameStore((state) => state.perfectCount);
+  const userInfo = useGameStore((state) => state.userInfo);
 
   const { camera } = useThree();
   /**
@@ -69,6 +71,8 @@ export default function Level() {
         residual.map((item, index) => {
           return <ResidualBlock key={index} {...item} />;
         })}
+
+      {userInfo && userInfo.address !== "invited" && <MaxScoreLine />}
     </>
   );
 }
