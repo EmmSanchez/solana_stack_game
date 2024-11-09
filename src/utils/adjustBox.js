@@ -1,28 +1,13 @@
 import * as THREE from "three";
 
-export default function adjustBox(
-  currentBlock,
-  lastBlock,
-  axis,
-  score,
-  color,
-  colliderSize
-) {
+export default function adjustBox(currentBlock, lastBlock, axis, score, color) {
   const axisIndex = axis === "x" ? 0 : 2; // [x, y, z]
 
-  const currentBlockPosition = currentBlock.translation();
-
-  const currentBlockScale = [
-    colliderSize[0] * 2,
-    colliderSize[1] * 2,
-    colliderSize[2] * 2,
-  ];
-
   // LastBlock properties are array, currentBlock is an object
-  const difference = lastBlock.position[axisIndex] - currentBlockPosition[axis];
-
+  const difference =
+    lastBlock.position[axisIndex] - currentBlock.position[axis];
   const halfCombinedWith =
-    (lastBlock.scale[axisIndex] + currentBlockScale[axisIndex]) / 2;
+    (lastBlock.scale[axisIndex] + currentBlock.scale[axis]) / 2;
 
   if (Math.abs(difference) > halfCombinedWith) {
     return {};
@@ -47,17 +32,10 @@ export default function adjustBox(
   //   };
   // }
 
-  // console.log(currentBlockPosition);
-  // console.log(currentBlockScale);
-
-  const newPosition = [
-    currentBlockPosition["x"],
-    currentBlockPosition["y"],
-    currentBlockPosition["z"],
-  ];
+  const newPosition = [...currentBlock.position];
   newPosition[axisIndex] += difference / 2;
 
-  const newScale = [...currentBlockScale];
+  const newScale = [...currentBlock.scale];
   newScale[axisIndex] -= Math.abs(difference);
 
   return {

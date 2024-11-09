@@ -207,22 +207,22 @@ function Interface() {
           onClick={handleStart}
           className="fixed flex justify-center text-center top-0 left-0 size-full hover:cursor-pointer"
         >
-          <div className="absolute top-[5%] text-[6vw] text-cyan-50 font-bold">
+          <div className="absolute top-[5%] text-[3.8rem] min-[500px]:text-8xl sm:text-9xl 2xl:text-[6vw] text-cyan-50 font-bold">
             <p>SkyStacks</p>
 
             <div className="flex justify-center">
-              <p className="text-[1vw] font-medium w-fit bg-cyan-600 px-[.6vw] py-[.4vw] rounded-[.4vw]">
-                Top players = 🎁 airdrops!
+              <p className="text-2xl min-[370px]:text-4xl mt-8 2xl:text-[1vw] font-medium w-fit px-[.6vw] py-[.4vw] rounded-[.4vw]">
+                Top players = 👀🎁
               </p>
             </div>
 
-            <p className="mt-[12vw] text-[1.6vw] font-medium animate-pulse">
+            <p className="mt-[600px] max-[500px]:text-5xl 2xl:mt-[12vw] text-7xl 2xl:text-[1.6vw] font-medium animate-pulse">
               Touch to Start
             </p>
           </div>
 
-          <div className="absolute bottom-[4%] flex flex-col justify-center items-center gap-[1.6vw] text-white text-[1vw]">
-            <div className="flex gap-[1vw]">
+          <div className="absolute bottom-[4%] flex flex-col justify-center items-center gap-[1.6vw] text-white text-2xl md:text-3xl 2xl:text-[1vw]">
+            <div className="flex gap-10 2xl:gap-[1vw]">
               {!userInfo || userInfo.address === "invited" ? (
                 <>
                   <button
@@ -230,10 +230,12 @@ function Interface() {
                       e.stopPropagation();
                       handleConnectWallet();
                     }}
-                    className="flex items-center justify-center gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
+                    className="flex items-center justify-center gap-4 sm:gap-6 2xl:gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
                   >
-                    <p>Connect Wallet</p>
-                    <WalletIcon className="size-[1.5vw]" />
+                    <p className="max-[320px]:hidden">
+                      Connect <span className="max-[500px]:hidden">Wallet</span>
+                    </p>
+                    <WalletIcon className="size-8 sm:size-10 2xl:size-[1.5vw]" />
                   </button>
                 </>
               ) : (
@@ -243,35 +245,35 @@ function Interface() {
                       e.stopPropagation();
                       handleDisconnectWallet();
                     }}
-                    className="flex items-center justify-center gap-[.8vw] bg-[#9886E5] hover:bg-[#9886E5]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
+                    className="flex items-center justify-center gap-4 sm:gap-6 2xl:gap-[.8vw] max-[600px]:px-4 max-[600px]:py-2 bg-[#9886E5] hover:bg-[#9886E5]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
                   >
-                    <p>
-                      Disconnect{" "}
+                    <p className="max-[320px]:hidden">
+                      <span className="max-sm:hidden">Disconnect </span>
                       <span className="font-bold">
                         {userInfo.address.slice(0, 4)}...
                         {userInfo.address.slice(-4)}
                       </span>
                     </p>
-                    <LogoutIcon className="size-[1.5vw]" />
+                    <LogoutIcon className="size-8 sm:size-10 2xl:size-[1.5vw]" />
                   </button>
                 </>
               )}
               <button
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
+                className="flex items-center gap-4 sm:gap-6 2xl:gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
               >
-                <p>Leaderboard</p>
-                <ChartIcon className="size-[1.5vw]" />
+                <p className="max-[440px]:hidden">Leaderboard</p>
+                <ChartIcon className="size-8 sm:size-10 2xl:size-[1.5vw]" />
               </button>
             </div>
-            <div className="flex gap-[1vw] text-gray-200">
+            <div className="flex max-sm:mt-14 max-md:mt-8 gap-6 2xl:gap-[1vw] text-gray-200">
               <XIcon
                 onClick={(e) => e.stopPropagation()}
-                className="size-[1.8vw] transition hover:text-[#3DD2B4] hover:cursor-pointer"
+                className="size-10 2xl:size-[1.8vw] transition hover:text-[#3DD2B4] hover:cursor-pointer"
               />
               <TelegramIcon
                 onClick={(e) => e.stopPropagation()}
-                className="size-[1.8vw] transition hover:text-[#3DD2B4] hover:cursor-pointer"
+                className="size-10 2xl:size-[1.8vw] transition hover:text-[#3DD2B4] hover:cursor-pointer"
               />
             </div>
           </div>
@@ -283,13 +285,13 @@ function Interface() {
           onClick={handleCheckResult}
           className="fixed flex justify-center top-0 left-0 size-full text-center hover:cursor-pointer"
         >
-          <div className="absolute top-[2%] text-[8vw] text-white font-bold">
+          <div className="absolute top-[2%] max-[500px]:text-[14rem] text-[18rem] 2xl:text-[8vw] text-white font-bold">
             <p>{score}</p>
-            {perfectCount > 0 && (
+            {/* {perfectCount > 0 && (
               <p className="text-[2vw] font-normal tracking-widest">
                 x{perfectCount}
               </p>
-            )}
+            )} */}
           </div>
         </div>
       )}
@@ -297,12 +299,14 @@ function Interface() {
       {mode === "ended" && (
         <div className="fixed flex justify-center items-start top-0 left-0 size-full">
           {/* Ranking */}
-          <div className="bg-[#040D12] absolute top-[5%] left-[5%] w-[25%] h-[90%] rounded-[1.5vw] overflow-hidden shadow-[-15px_20px_30px_-22px_rgba(0,0,0,1)]">
+          <div className="bg-[#040D12] absolute top-[35%] 2xl:top-[5%] 2xl:left-[5%] max-xl:w-[80%] lg:w-[40%] 2xl:w-[25%] h-[600px] 2xl:h-[90%] rounded-[1.5vw] overflow-hidden shadow-[-15px_20px_30px_-22px_rgba(0,0,0,1)]">
             <div className="absolute z-10 size-full shadow-zinc-500/20 bg-gradient-to-b from-transparent via-zinc-950/60 via-90% to-zinc-950 rounded-b-[1.5vw] pointer-events-none"></div>
 
             <div className="relative flex text-white w-full h-[15%]">
               <div className="w-full flex justify-center items-center bg-gradient-to-r from-[#5C8374] to-[#93B1A6] rounded-t-[1.5vw]">
-                <h2 className="text-[2vw] font-bold">Leaderboard</h2>
+                <h2 className="max-lg:text-xl text-[2vw] font-bold">
+                  Leaderboard
+                </h2>
               </div>
             </div>
 
@@ -311,13 +315,13 @@ function Interface() {
               <div className="table table-auto text-white w-full">
                 <div className="table-header-group">
                   <div className="table-row bg-[#040D12]">
-                    <div className="table-cell py-[.4vw] px-[.8vw] text-zinc-500 text-[1vw] font-semibold border-solid border-b-[.1vw] border-white/20">
+                    <div className="table-cell px-2 py-1 2xl:py-[.4vw] 2xl:px-[.8vw] text-zinc-500 max-sm:text-lg max-xl:text-xl 2xl:text-[1vw] font-semibold border-solid border-b-[.1vw] border-white/20">
                       Rank
                     </div>
-                    <div className="table-cell py-[.4vw] px-[.8vw] text-zinc-500 text-[1vw] font-semibold border-solid border-b-[.1vw] border-white/20">
+                    <div className="table-cell px-2 py-1 2xl:py-[.4vw] 2xl:px-[.8vw] text-zinc-500 max-sm:text-lg max-xl:text-xl 2xl:text-[1vw] font-semibold border-solid border-b-[.1vw] border-white/20">
                       Name
                     </div>
-                    <div className="table-cell py-[.4vw] px-[.8vw] text-zinc-500 text-[1vw] font-semibold border-solid border-b-[.1vw] border-white/20">
+                    <div className="table-cell px-2 py-1 2xl:py-[.4vw] 2xl:px-[.8vw] text-zinc-500 max-sm:text-lg max-xl:text-xl 2xl:text-[1vw] font-semibold border-solid border-b-[.1vw] border-white/20">
                       Score
                     </div>
                   </div>
@@ -328,13 +332,13 @@ function Interface() {
                     users.slice(0, 15).map((user, index) => {
                       return (
                         <div key={index} className="table-row">
-                          <div className="table-cell py-[.4vw] px-[.8vw] text-zinc-300 text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
+                          <div className="table-cell px-2 py-1 2xl:py-[.4vw] 2xl:px-[.8vw] text-zinc-300 max-sm:text-lg max-lg:text-xl 2xl:text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
                             {user.rank}
                           </div>
-                          <div className="table-cell py-[.4vw] px-[.8vw] text-zinc-300 text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
+                          <div className="table-cell px-2 py-1 2xl:py-[.4vw] 2xl:px-[.8vw] text-zinc-300 max-sm:text-lg max-lg:text-xl 2xl:text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
                             {user.address.slice(0, 16)}...
                           </div>
-                          <div className="table-cell py-[.4vw] px-[.8vw] text-[#00FFB0] text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
+                          <div className="table-cell px-2 py-1 2xl:py-[.4vw] 2xl:px-[.8vw] text-[#00FFB0] max-sm:text-lg max-lg:text-xl 2xl:text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
                             {user.max_score}
                           </div>
                         </div>
@@ -347,7 +351,7 @@ function Interface() {
             {/* Current User */}
             <div className="absolute flex z-20 bottom-[2%] justify-center w-full h-[10%]">
               <>
-                <div className="w-[95%] flex justify-around items-center text-white text-[1vw] font-semibold rounded-[1vw] bg-[#040D12]/20 backdrop-blur-[1vw] border-solid border-[.1vw] border-[#5C8374]">
+                <div className="w-[95%] flex justify-around items-center text-white max-sm:text-lg max-lg:text-xl 2xl:text-[1vw] font-semibold rounded-[1vw] bg-[#040D12]/20 backdrop-blur-[1vw] border-solid border-[.1vw] border-[#5C8374]">
                   <p>
                     {userInfo && userInfo.address !== "invited" ? (
                       <>{userInfo.rank}</>
@@ -377,7 +381,63 @@ function Interface() {
             </div>
           </div>
 
-          <div className="absolute flex flex-col items-center gap-[1vw] top-[5%] right-[5%] w-[25%] h-[90%]">
+          <div className="relative 2xl:hidden top-[28%] flex flex-col max-xl:w-[80%] lg:w-[40%] h-[5%] font-semibold text-[#040D12]">
+            <div className="w-full h-[20%] mb-6 flex justify-between items-center text-[#3DD2B4]">
+              {userInfo && userInfo.address !== "invited" ? (
+                <>
+                  <div className="flex gap-4 text-xl md:text-3xl justify-center items-center font-semibold">
+                    <UserIcon className="size-6 md:size-10 2xl:size-[1.4vw]" />
+                    {userInfo.address.slice(0, 4)}...
+                    {userInfo.address.slice(-4)}
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <HomeIcon
+                      onClick={handleGoToHome}
+                      className="size-6 md:size-10 hover:cursor-pointer transition ease-in-out"
+                    />
+                    <LogoutIcon
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDisconnectWallet();
+                      }}
+                      className="size-6 md:size-10 hover:cursor-pointer transition ease-in-out"
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex gap-4 text-xl md:text-3xl justify-center items-center font-semibold">
+                    <UserIcon className="size-6 md:size-10" />
+                    invited
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <HomeIcon
+                      onClick={handleGoToHome}
+                      className="size-6 md:size-10  hover:cursor-pointer transition ease-in-out"
+                    />
+                    <WalletIcon
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleConnectWallet();
+                      }}
+                      className="size-6 md:size-10  hover:cursor-pointer transition ease-in-out"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            <button
+              onClick={handleRestart}
+              className="flex items-center justify-center gap-[.8vw] text-[1.6rem] md:text-[2rem] 2xl:text-[1.2vw] w-full h-[100%] bg-[#3DD2B4] hover:bg-[#36b39a] px-[2vw] rounded-[1vw] transition ease-in-out"
+            >
+              <Restart className="rotate-180 size-6 md:size-8 2xl:size-[1.4vw]" />
+              Restart
+            </button>
+          </div>
+
+          {/* Right UI of stats */}
+          <div className="absolute max-2xl:hidden flex flex-col items-center gap-[1vw] top-[5%] right-[5%] w-[25%] h-[90%]">
             <div className="w-full h-[8%] flex justify-between items-center text-[#3DD2B4]">
               {userInfo && userInfo.address !== "invited" ? (
                 <>

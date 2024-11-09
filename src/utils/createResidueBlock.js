@@ -5,30 +5,17 @@ export default function createResidueBlock(
   difference,
   axis,
   score,
-  color,
-  colliderSize
+  color
 ) {
   // currentBlock properties are objects, newBlock's ones are arrays
   if (!newBlock) return null;
   if (difference === 0) return null;
   const axisIndex = axis === "x" ? 0 : 2;
 
-  const currentBlockPosition = currentBlock.translation();
-
-  const currentBlockScale = [
-    colliderSize[0] * 2,
-    colliderSize[1] * 2,
-    colliderSize[2] * 2,
-  ];
-
-  const newScale = [...currentBlockScale];
+  const newScale = [...currentBlock.scale];
   newScale[axisIndex] = newScale[axisIndex] - newBlock.scale[axisIndex];
 
-  const newPosition = [
-    currentBlockPosition["x"],
-    currentBlockPosition["y"],
-    currentBlockPosition["z"],
-  ];
+  const newPosition = [...currentBlock.position];
 
   if (difference > 0) {
     newPosition[axisIndex] -= 0.05 + newBlock.scale[axisIndex] / 2;

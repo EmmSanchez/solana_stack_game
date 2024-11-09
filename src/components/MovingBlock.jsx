@@ -66,7 +66,7 @@ export function MovingBlock({ position, scale }) {
   useEffect(() => {
     if (mode === "validating") {
       const lastBlock = blocks[blocks.length - 1];
-      const currentBlock = block.current;
+      const currentBlock = meshBlock.current;
 
       const adjustAxis = score % 2 === 0 ? "x" : "z";
       const { newBlock, meta } = adjustBox(
@@ -74,22 +74,14 @@ export function MovingBlock({ position, scale }) {
         lastBlock,
         adjustAxis,
         score,
-        color,
-        colliderSize
+        color
       );
 
       if (!newBlock) {
-        const currentBlockPosition = currentBlock.translation();
-        const newPosition = [
-          currentBlockPosition["x"],
-          currentBlockPosition["y"],
-          currentBlockPosition["z"],
-        ];
-
         const finalBlock = {
-          position: newPosition,
-          scale: scale,
-          color: new THREE.Color(`hsl(${(score - 1) * 14 + color}, 60%, 50%)`),
+          position: currentBlock.position,
+          scale: currentBlock.scale,
+          color: currentBlock.material.color,
         };
 
         setResidual([...residual, finalBlock]);
@@ -108,8 +100,7 @@ export function MovingBlock({ position, scale }) {
         meta.difference,
         adjustAxis,
         score,
-        color,
-        colliderSize
+        color
       );
 
       setBlocks([...blocks, newBlock]);
