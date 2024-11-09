@@ -36,18 +36,28 @@ export function MovingBlock({ position, scale }) {
   const { clock } = useThree();
 
   useFrame((state, delta) => {
+    const elapsedTime = state.clock.elapsedTime;
     if (mode === "playing") {
-      // Coloca el bloque en la posición actual en el eje y
       block.current.setNextKinematicTranslation({
         x:
           score % 2 === 0
-            ? Math.sin(state.clock.elapsedTime * speed) * 6
+            ? Math.sin(elapsedTime * speed) * 6
             : block.current.translation().x,
         y: (score + 1) * 0.5,
         z:
           score % 2 !== 0
-            ? Math.sin(state.clock.elapsedTime * speed) * 6
+            ? Math.sin(elapsedTime * speed) * 6
             : block.current.translation().z,
+      });
+
+      console.log(block.current.translation());
+    }
+
+    if (mode === "validating") {
+      block.current.setTranslation({
+        x: Math.sin(4.8 * speed) * 6,
+        y: (score + 1) * 0.5,
+        z: Math.sin(4.8 * speed) * 6,
       });
     }
   });
@@ -110,7 +120,6 @@ export function MovingBlock({ position, scale }) {
 
       continuePlaying();
     }
-
     clock.elapsedTime = 4.8;
   }, [mode]);
 
