@@ -6,7 +6,6 @@ import { BlocksTower } from "./components/BlocksTower.jsx";
 import { MovingBlock } from "./components/MovingBlock.jsx";
 import { ResidualBlock } from "./components/ResidualBlock.jsx";
 import { MaxScoreLine } from "./components/MaxScoreLine.jsx";
-import ValidatingBlock from "./components/ValidatingBlock.jsx";
 
 export default function Level() {
   const blocks = useGameStore((state) => state.blocks);
@@ -63,13 +62,6 @@ export default function Level() {
 
       {(mode === "playing" || mode === "validating") && (
         <MovingBlock
-          position={[position[0], (score + 1) * 0.5, position[2]]}
-          scale={scale}
-        />
-      )}
-
-      {mode === "validating" && (
-        <ValidatingBlock
           position={[position[0], (score + 1) * 0.5, position[2]]}
           scale={scale}
         />

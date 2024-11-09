@@ -1,5 +1,5 @@
 import { useGameStore } from "../store/useGame.js";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { CuboidCollider, RigidBody } from "@react-three/rapier";
@@ -10,6 +10,7 @@ const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 
 export function MovingBlock({ position, scale }) {
   const block = useRef();
+  const meshBlock = useRef();
 
   const blocks = useGameStore((state) => state.blocks);
   const setBlocks = useGameStore((state) => state.setBlocks);
@@ -38,26 +39,26 @@ export function MovingBlock({ position, scale }) {
   useFrame((state, delta) => {
     const elapsedTime = state.clock.elapsedTime;
     if (mode === "playing") {
+      // Move oscilation of mesh
+      meshBlock.current.position.y = (score + 1) * 0.5;
+
+      if (score % 2 === 0) {
+        meshBlock.current.position.x = -Math.cos(elapsedTime * speed) * 6;
+      } else {
+        meshBlock.current.position.z = -Math.cos(elapsedTime * speed) * 6;
+      }
+
+      // Move oscilation of collider
       block.current.setNextKinematicTranslation({
         x:
           score % 2 === 0
-            ? Math.sin(elapsedTime * speed) * 6
+            ? -Math.cos(elapsedTime * 1) * 6
             : block.current.translation().x,
         y: (score + 1) * 0.5,
         z:
           score % 2 !== 0
-            ? Math.sin(elapsedTime * speed) * 6
+            ? -Math.cos(elapsedTime * 1) * 6
             : block.current.translation().z,
-      });
-
-      console.log(block.current.translation());
-    }
-
-    if (mode === "validating") {
-      block.current.setTranslation({
-        x: Math.sin(4.8 * speed) * 6,
-        y: (score + 1) * 0.5,
-        z: Math.sin(4.8 * speed) * 6,
       });
     }
   });
@@ -90,7 +91,6 @@ export function MovingBlock({ position, scale }) {
           scale: scale,
           color: new THREE.Color(`hsl(${(score - 1) * 14 + color}, 60%, 50%)`),
         };
-        console.log(finalBlock);
 
         setResidual([...residual, finalBlock]);
         return end();
@@ -120,22 +120,33 @@ export function MovingBlock({ position, scale }) {
 
       continuePlaying();
     }
-    clock.elapsedTime = 4.8;
+    clock.elapsedTime = 0;
   }, [mode]);
 
   return (
-    <RigidBody
-      ref={block}
-      type="kinematicPosition"
-      colliders={false}
-      position={position}
-    >
-      <mesh geometry={boxGeometry} castShadow receiveShadow scale={scale}>
+    <>
+      {/* Mesh Block */}
+      <mesh
+        ref={meshBlock}
+        geometry={boxGeometry}
+        castShadow
+        position={position}
+        scale={scale}
+      >
         <meshStandardMaterial
           color={`hsl(${(score - 1) * 14 + color}, 60%, 50%)`}
         />
       </mesh>
-      <CuboidCollider args={colliderSize} />
-    </RigidBody>
+
+      {/* Collider */}
+      <RigidBody
+        ref={block}
+        type="kinematicPosition"
+        colliders={false}
+        position={position}
+      >
+        <CuboidCollider args={colliderSize} />
+      </RigidBody>
+    </>
   );
 }
