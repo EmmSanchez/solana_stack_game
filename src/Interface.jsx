@@ -3,10 +3,12 @@ import data from "./fakeData.json";
 import { useEffect, useState } from "react";
 import {
   ChartIcon,
+  CrownIcon,
   HomeIcon,
   LogoutIcon,
   Restart,
   ShareIcon,
+  SolanaIcon,
   TelegramIcon,
   UserIcon,
   WalletIcon,
@@ -205,76 +207,82 @@ function Interface() {
       {mode === "ready" && (
         <div
           onClick={handleStart}
-          className="fixed flex justify-center text-center top-0 left-0 size-full hover:cursor-pointer"
+          className="fixed flex p-8 flex-col justify-between text-center top-0 left-0 size-full hover:cursor-pointer"
         >
-          <div className="absolute top-[5%] text-[3.8rem] min-[500px]:text-8xl sm:text-9xl 2xl:text-[6vw] text-cyan-50 font-bold">
-            <p>SkyStacks</p>
+          {/* Hero */}
+          <div className="flex flex-col justify-center items-center">
+            <div className="flex w-full max-w-2xl">
+              <div className="flex items-center w-full justify-between">
+                <div className="flex gap-2 text-gray-200">
+                  <XIcon
+                    onClick={(e) => e.stopPropagation()}
+                    className="size-10 p-2 rounded-md hover:bg-zinc-900 hover:cursor-pointer"
+                  />
+                  <TelegramIcon
+                    onClick={(e) => e.stopPropagation()}
+                    className="size-10 p-2 rounded-md hover:bg-zinc-900 hover:cursor-pointer"
+                  />
+                </div>
 
-            <div className="flex justify-center">
-              <p className="text-2xl min-[370px]:text-4xl mt-8 2xl:text-[1vw] font-medium w-fit px-[.6vw] py-[.4vw] rounded-[.4vw]">
-                Top players = 👀🎁
-              </p>
+                {/* Solana Price */}
+                <div className="flex items-center gap-4 bg-gradient-to-bl from-neutral-800 to-neutral-950 rounded-md px-4 py-2">
+                  <SolanaIcon className="size-6" />
+                  <p className="text-white">$207.28</p>
+                </div>
+              </div>
             </div>
 
-            <p className="mt-[600px] max-[500px]:text-5xl 2xl:mt-[12vw] text-7xl 2xl:text-[1.6vw] font-medium animate-pulse">
-              Touch to Start
-            </p>
+            <div className="flex flex-col justify-center items-center gap-2 mt-5 text-6xl text-white font-bold">
+              <p>SkyStacks</p>
+              <div className="flex items-center gap-3">
+                <CrownIcon className="size-6" />
+                <p className="text-2xl">
+                  {userInfo && userInfo.address !== "invited" ? (
+                    <>{userInfo.max_score}</>
+                  ) : (
+                    <>{score}</>
+                  )}
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div className="absolute bottom-[4%] flex flex-col justify-center items-center gap-[1.6vw] text-white text-2xl md:text-3xl 2xl:text-[1vw]">
-            <div className="flex gap-10 2xl:gap-[1vw]">
-              {!userInfo || userInfo.address === "invited" ? (
-                <>
+          <div className="text-2xl text-white/50 font-medium animate-pulse">
+            <p>Touch to Start</p>
+          </div>
+
+          {/*  Connect and Leaderboard  */}
+          <div className="flex w-full justify-center items-center">
+            <div className="flex flex-col w-full justify-center items-center max-w-xl gap-3">
+              <div className="w-full p-[1px] bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
+                {!userInfo || userInfo.address === "invited" ? (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleConnectWallet();
                     }}
-                    className="flex items-center justify-center gap-4 sm:gap-6 2xl:gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
+                    className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-b from-[#352C65] to-[#121130]"
                   >
-                    <p className="max-[320px]:hidden">
-                      Connect <span className="max-[500px]:hidden">Wallet</span>
-                    </p>
-                    <WalletIcon className="size-8 sm:size-10 2xl:size-[1.5vw]" />
+                    <p>Connect Wallet</p>
+                    <WalletIcon className="size-6" />
                   </button>
-                </>
-              ) : (
-                <>
+                ) : (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDisconnectWallet();
                     }}
-                    className="flex items-center justify-center gap-4 sm:gap-6 2xl:gap-[.8vw] max-[600px]:px-4 max-[600px]:py-2 bg-[#9886E5] hover:bg-[#9886E5]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
+                    className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-b from-[#352C65] to-[#121130]"
                   >
-                    <p className="max-[320px]:hidden">
-                      <span className="max-sm:hidden">Disconnect </span>
-                      <span className="font-bold">
-                        {userInfo.address.slice(0, 4)}...
-                        {userInfo.address.slice(-4)}
-                      </span>
-                    </p>
-                    <LogoutIcon className="size-8 sm:size-10 2xl:size-[1.5vw]" />
+                    <p>Disconnect Wallet</p>
+                    <LogoutIcon className="size-6" />
                   </button>
-                </>
-              )}
-              <button
-                onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-4 sm:gap-6 2xl:gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
-              >
-                <p className="max-[440px]:hidden">Leaderboard</p>
-                <ChartIcon className="size-8 sm:size-10 2xl:size-[1.5vw]" />
+                )}
+              </div>
+              <button className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-br from-[#A57FFE] to-[#4E6EFF]">
+                <p>Leaderboard</p>
+                <ChartIcon className="size-6" />
               </button>
-            </div>
-            <div className="flex max-sm:mt-14 max-md:mt-8 gap-6 2xl:gap-[1vw] text-gray-200">
-              <XIcon
-                onClick={(e) => e.stopPropagation()}
-                className="size-10 2xl:size-[1.8vw] transition hover:text-[#3DD2B4] hover:cursor-pointer"
-              />
-              <TelegramIcon
-                onClick={(e) => e.stopPropagation()}
-                className="size-10 2xl:size-[1.8vw] transition hover:text-[#3DD2B4] hover:cursor-pointer"
-              />
             </div>
           </div>
         </div>
