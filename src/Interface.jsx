@@ -1,5 +1,4 @@
 import { useGameStore } from "./store/useGame";
-import data from "./fakeData.json";
 import { useEffect, useState } from "react";
 import {
   ChartIcon,
@@ -19,6 +18,8 @@ import {
 // const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
 
 function Interface() {
+  const [users, setUsers] = useState([]);
+
   const mode = useGameStore((state) => state.mode);
   const start = useGameStore((state) => state.start);
   const score = useGameStore((state) => state.score);
@@ -29,8 +30,6 @@ function Interface() {
 
   const userInfo = useGameStore((state) => state.userInfo);
   const setUserInfo = useGameStore((state) => state.setUserInfo);
-
-  const [users, setUsers] = useState(data);
 
   const handleStart = () => {
     start();
@@ -247,7 +246,7 @@ function Interface() {
             </div>
           </div>
 
-          <div className="text-2xl text-white/50 font-medium animate-pulse">
+          <div className="mt-8 text-2xl text-white/50 font-medium animate-pulse">
             <p>Touch to Start</p>
           </div>
 
@@ -261,7 +260,7 @@ function Interface() {
                       e.stopPropagation();
                       handleConnectWallet();
                     }}
-                    className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-b from-[#352C65] to-[#121130]"
+                    className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-b from-[#352C65] to-[#121130] transition-all hover:opacity-95"
                   >
                     <p>Connect Wallet</p>
                     <WalletIcon className="size-6" />
@@ -272,14 +271,14 @@ function Interface() {
                       e.stopPropagation();
                       handleDisconnectWallet();
                     }}
-                    className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-b from-[#352C65] to-[#121130]"
+                    className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-b from-[#352C65] to-[#121130] transition-all hover:opacity-95"
                   >
                     <p>Disconnect Wallet</p>
                     <LogoutIcon className="size-6" />
                   </button>
                 )}
               </div>
-              <button className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-br from-[#A57FFE] to-[#4E6EFF]">
+              <button className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-br from-[#A57FFE] to-[#4E6EFF] transition-all hover:opacity-95">
                 <p>Leaderboard</p>
                 <ChartIcon className="size-6" />
               </button>
@@ -288,12 +287,12 @@ function Interface() {
         </div>
       )}
 
-      {mode !== "ready" && (
+      {mode !== "ready" && mode !== "ended" && (
         <div
           onClick={handleCheckResult}
           className="fixed flex justify-center top-0 left-0 size-full text-center hover:cursor-pointer"
         >
-          <div className="absolute top-[2%] max-[500px]:text-[14rem] text-[18rem] 2xl:text-[8vw] text-white font-bold">
+          <div className="max-lg:mt-24 lg:mt-10 max-lg:text-7xl lg:text-9xl text-white font-bold">
             <p>{score}</p>
             {/* {perfectCount > 0 && (
               <p className="text-[2vw] font-normal tracking-widest">
@@ -305,79 +304,32 @@ function Interface() {
       )}
 
       {mode === "ended" && (
-        <div className="fixed flex justify-center items-start top-0 left-0 size-full">
-          {/* Ranking */}
-          <div className="bg-[#040D12] absolute top-[35%] 2xl:top-[5%] 2xl:left-[5%] max-xl:w-[80%] lg:w-[40%] 2xl:w-[25%] h-[600px] 2xl:h-[90%] rounded-[1.5vw] overflow-hidden shadow-[-15px_20px_30px_-22px_rgba(0,0,0,1)]">
-            <div className="absolute z-10 size-full shadow-zinc-500/20 bg-gradient-to-b from-transparent via-zinc-950/60 via-90% to-zinc-950 rounded-b-[1.5vw] pointer-events-none"></div>
+        <div className="fixed flex flex-col justify-between items-start top-0 left-0 size-full">
+          <div className="fixed flex flex-col justify-between text-center top-0 left-0 size-full hover:cursor-pointer">
+            {/* Hero */}
+            <div className="flex p-8 flex-col justify-center items-center">
+              <div className="flex w-full max-w-2xl">
+                <div className="flex items-center w-full justify-between">
+                  <div className="flex items-center gap-2 text-gray-200">
+                    <HomeIcon
+                      onClick={(e) => e.stopPropagation()}
+                      className="size-10 p-2 rounded-md  hover:bg-zinc-900 hover:cursor-pointer"
+                    />
+                    <p className="font-medium">Home</p>
+                  </div>
 
-            <div className="relative flex text-white w-full h-[15%]">
-              <div className="w-full flex justify-center items-center bg-gradient-to-r from-[#5C8374] to-[#93B1A6] rounded-t-[1.5vw]">
-                <h2 className="max-lg:text-xl text-[2vw] font-bold">
-                  Leaderboard
-                </h2>
-              </div>
-            </div>
-
-            {/* Table */}
-            <div className="relative w-full h-full">
-              <div className="table table-auto text-white w-full">
-                <div className="table-header-group">
-                  <div className="table-row bg-[#040D12]">
-                    <div className="table-cell px-2 py-1 2xl:py-[.4vw] 2xl:px-[.8vw] text-zinc-500 max-sm:text-lg max-xl:text-xl 2xl:text-[1vw] font-semibold border-solid border-b-[.1vw] border-white/20">
-                      Rank
-                    </div>
-                    <div className="table-cell px-2 py-1 2xl:py-[.4vw] 2xl:px-[.8vw] text-zinc-500 max-sm:text-lg max-xl:text-xl 2xl:text-[1vw] font-semibold border-solid border-b-[.1vw] border-white/20">
-                      Name
-                    </div>
-                    <div className="table-cell px-2 py-1 2xl:py-[.4vw] 2xl:px-[.8vw] text-zinc-500 max-sm:text-lg max-xl:text-xl 2xl:text-[1vw] font-semibold border-solid border-b-[.1vw] border-white/20">
-                      Score
-                    </div>
+                  {/* Solana Price */}
+                  <div className="flex items-center gap-4 bg-gradient-to-bl from-neutral-800 to-neutral-950 rounded-md px-4 py-2">
+                    <SolanaIcon className="size-6" />
+                    <p className="text-white">$207.28</p>
                   </div>
                 </div>
-
-                <div className="table-row-group rounded-b-[1.5vw]">
-                  {users &&
-                    users.slice(0, 15).map((user, index) => {
-                      return (
-                        <div key={index} className="table-row">
-                          <div className="table-cell px-2 py-1 2xl:py-[.4vw] 2xl:px-[.8vw] text-zinc-300 max-sm:text-lg max-lg:text-xl 2xl:text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
-                            {user.rank}
-                          </div>
-                          <div className="table-cell px-2 py-1 2xl:py-[.4vw] 2xl:px-[.8vw] text-zinc-300 max-sm:text-lg max-lg:text-xl 2xl:text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
-                            {user.address.slice(0, 16)}...
-                          </div>
-                          <div className="table-cell px-2 py-1 2xl:py-[.4vw] 2xl:px-[.8vw] text-[#00FFB0] max-sm:text-lg max-lg:text-xl 2xl:text-[1vw] font-medium border-solid border-b-[.1vw] border-white/20">
-                            {user.max_score}
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
               </div>
-            </div>
 
-            {/* Current User */}
-            <div className="absolute flex z-20 bottom-[2%] justify-center w-full h-[10%]">
-              <>
-                <div className="w-[95%] flex justify-around items-center text-white max-sm:text-lg max-lg:text-xl 2xl:text-[1vw] font-semibold rounded-[1vw] bg-[#040D12]/20 backdrop-blur-[1vw] border-solid border-[.1vw] border-[#5C8374]">
-                  <p>
-                    {userInfo && userInfo.address !== "invited" ? (
-                      <>{userInfo.rank}</>
-                    ) : (
-                      <>#</>
-                    )}
-                  </p>
-                  <p>
-                    {userInfo && userInfo.address !== "invited" ? (
-                      <>
-                        {userInfo.address.slice(0, 4)}...
-                        {userInfo.address.slice(-4)}
-                      </>
-                    ) : (
-                      <>invited</>
-                    )}
-                  </p>
-                  <p className="text-[#00FFB0]">
+              <div className="flex flex-col justify-center items-center gap-2 mt-5 text-white font-bold">
+                <p className="text-2xl">Highest Score</p>
+                <div className="flex items-center gap-3 -mt-2">
+                  <p className="text-8xl">
                     {userInfo && userInfo.address !== "invited" ? (
                       <>{userInfo.max_score}</>
                     ) : (
@@ -385,150 +337,59 @@ function Interface() {
                     )}
                   </p>
                 </div>
-              </>
-            </div>
-          </div>
-
-          <div className="relative 2xl:hidden top-[28%] flex flex-col max-xl:w-[80%] lg:w-[40%] h-[5%] font-semibold text-[#040D12]">
-            <div className="w-full h-[20%] mb-6 flex justify-between items-center text-[#3DD2B4]">
-              {userInfo && userInfo.address !== "invited" ? (
-                <>
-                  <div className="flex gap-4 text-xl md:text-3xl justify-center items-center font-semibold">
-                    <UserIcon className="size-6 md:size-10 2xl:size-[1.4vw]" />
-                    {userInfo.address.slice(0, 4)}...
-                    {userInfo.address.slice(-4)}
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <HomeIcon
-                      onClick={handleGoToHome}
-                      className="size-6 md:size-10 hover:cursor-pointer transition ease-in-out"
-                    />
-                    <LogoutIcon
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDisconnectWallet();
-                      }}
-                      className="size-6 md:size-10 hover:cursor-pointer transition ease-in-out"
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex gap-4 text-xl md:text-3xl justify-center items-center font-semibold">
-                    <UserIcon className="size-6 md:size-10" />
-                    invited
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <HomeIcon
-                      onClick={handleGoToHome}
-                      className="size-6 md:size-10  hover:cursor-pointer transition ease-in-out"
-                    />
-                    <WalletIcon
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleConnectWallet();
-                      }}
-                      className="size-6 md:size-10  hover:cursor-pointer transition ease-in-out"
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-
-            <button
-              onClick={handleRestart}
-              className="flex items-center justify-center gap-[.8vw] text-[1.6rem] md:text-[2rem] 2xl:text-[1.2vw] w-full h-[100%] bg-[#3DD2B4] hover:bg-[#36b39a] px-[2vw] rounded-[1vw] transition ease-in-out"
-            >
-              <Restart className="rotate-180 size-6 md:size-8 2xl:size-[1.4vw]" />
-              Restart
-            </button>
-          </div>
-
-          {/* Right UI of stats */}
-          <div className="absolute max-2xl:hidden flex flex-col items-center gap-[1vw] top-[5%] right-[5%] w-[25%] h-[90%]">
-            <div className="w-full h-[8%] flex justify-between items-center text-[#3DD2B4]">
-              {userInfo && userInfo.address !== "invited" ? (
-                <>
-                  <div className="flex gap-[.6vw] text-[1vw] justify-center items-center font-semibold">
-                    <UserIcon className="size-[1.4vw]" />
-                    {userInfo.address.slice(0, 4)}...
-                    {userInfo.address.slice(-4)}
-                  </div>
-                  <div className="flex items-center gap-[.2vw]">
-                    <HomeIcon
-                      onClick={handleGoToHome}
-                      className="size-[3vw] hover:bg-[#040D12] p-[.8vw] rounded-[.4vw] hover:cursor-pointer transition ease-in-out"
-                    />
-                    <LogoutIcon
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDisconnectWallet();
-                      }}
-                      className="size-[3vw] hover:bg-[#040D12] p-[.8vw] rounded-[.4vw] hover:cursor-pointer transition ease-in-out"
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex gap-[.6vw] text-[1vw] justify-center items-center font-semibold">
-                    <UserIcon className="size-[1.4vw]" />
-                    invited
-                  </div>
-                  <div className="flex items-center gap-[.2vw]">
-                    <HomeIcon
-                      onClick={handleGoToHome}
-                      className="size-[3vw] hover:bg-[#040D12] p-[.8vw] rounded-[.4vw] hover:cursor-pointer transition ease-in-out"
-                    />
-                    <WalletIcon
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleConnectWallet();
-                      }}
-                      className="size-[3vw] hover:bg-[#040D12] p-[.8vw] rounded-[.4vw] hover:cursor-pointer transition ease-in-out"
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div className="relative flex flex-col justify-center items-center bg-[#040D12] w-full h-[20%] rounded-[1vw] overflow-hidden">
-              <p className="text-[4vw] font-extrabold leading-[4vw] text-[#3DD2B4]">
-                {userInfo && userInfo.address !== "invited" ? (
-                  <>{userInfo.max_score}</>
-                ) : (
-                  <>{score}</>
-                )}
-              </p>
-              <p className="text-[1.5vw] font-medium text-gray-400">
-                Highest Score
-              </p>
-            </div>
-
-            <div className="flex w-full h-[8%] font-semibold text-[#040D12]">
-              <button
-                onClick={handleRestart}
-                className="flex items-center justify-center gap-[.8vw] text-[1.2vw] w-full bg-[#3DD2B4] hover:bg-[#36b39a] px-[2vw] rounded-[1vw] transition ease-in-out"
-              >
-                <Restart className="rotate-180 size-[1.4vw]" />
-                Restart
-              </button>
-            </div>
-
-            <div className="relative top-[38%] left-0 flex flex-col justify-center items-center w-full h-[20%] gap-[1vw] font-semibold">
-              {/* <button
-                onClick={handleShareScore}
-                className="flex items-center justify-center gap-[.8vw] text-[1.2vw] w-full h-[35%] hover:bg-[#040D12]/20 px-[2vw] rounded-[1vw] transition ease-in-out text-[#3DD2B4]"
-              >
-                <ShareIcon className="rotate-180 size-[1.4vw]" />
-                Share Score
-              </button> */}
-              <div className="text-white text-[1.6vw]">
-                <p>SkyStacks</p>
               </div>
 
-              <div className="flex gap-[1vw] text-gray-200">
-                <XIcon className="size-[1.8vw] transition hover:text-[#3DD2B4] hover:cursor-pointer" />
-                <TelegramIcon className="size-[1.8vw] transition hover:text-[#3DD2B4] hover:cursor-pointer" />
+              <div className="w-full max-w-xl mt-2">
+                <button
+                  onClick={(e) => {
+                    handleRestart();
+                    e.stopPropagation();
+                  }}
+                  className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-br from-[#A57FFE] to-[#4E6EFF] transition-all hover:opacity-95"
+                >
+                  <p className="text-xl">Play Again</p>
+                  <Restart className="size-6 rotate-180" />
+                </button>
+              </div>
+            </div>
+
+            {/*  Leaderboard  */}
+            <div className="flex w-full justify-center items-center">
+              <div className="flex flex-col w-full items-center pt-5 max-w-xl h-96 gap-2 bg-[#100D26]/80 backdrop-blur-md rounded-t-3xl">
+                {users ? (
+                  <>
+                    {users.slice(0, 5).map((user, index) => {
+                      return (
+                        <div
+                          key={index}
+                          className={`${
+                            index < 3
+                              ? "p-[1px] bg-gradient-to-r from-blue-500 to-purple-500"
+                              : ""
+                          } w-11/12 rounded-lg`}
+                        >
+                          <div
+                            className={`flex w-full h-12 justify-around items-center gap-4 rounded-lg text-white ${
+                              index < 3
+                                ? "bg-gradient-to-b from-[#352C65] to-[#121130]"
+                                : "bg-[#2D1C46]"
+                            } transition-all hover:opacity-95`}
+                          >
+                            <p className="flex-1">{index}</p>
+                            <p className="flex-grow text-left w-[60%]">
+                              5oKHBsVJyE2vk5rfkbneTzTrjbvJKkcgxpuB7LeAtrve
+                            </p>
+                            <p className="flex-1">120</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </>
+                ) : (
+                  <>
+                    <p className="text-white">Hello</p>
+                  </>
+                )}
               </div>
             </div>
           </div>
