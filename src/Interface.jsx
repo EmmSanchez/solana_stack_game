@@ -305,14 +305,17 @@ function Interface() {
 
       {mode === "ended" && (
         <div className="fixed flex flex-col justify-between items-start top-0 left-0 size-full">
-          <div className="fixed flex flex-col justify-between text-center top-0 left-0 size-full hover:cursor-pointer">
+          <div className="fixed flex flex-col justify-between text-center top-0 left-0 size-full">
             {/* Hero */}
             <div className="flex p-8 flex-col justify-center items-center">
               <div className="flex w-full max-w-2xl">
                 <div className="flex items-center w-full justify-between">
                   <div className="flex items-center gap-2 text-gray-200">
                     <HomeIcon
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        handleGoToHome();
+                        e.stopPropagation();
+                      }}
                       className="size-10 p-2 rounded-md  hover:bg-zinc-900 hover:cursor-pointer"
                     />
                     <p className="font-medium">Home</p>
@@ -338,8 +341,11 @@ function Interface() {
                   </p>
                 </div>
               </div>
+            </div>
 
-              <div className="w-full max-w-xl mt-2">
+            {/*  Leaderboard  */}
+            <div className="flex flex-col w-full justify-center items-center">
+              <div className="w-full max-w-xl mb-4 px-4">
                 <button
                   onClick={(e) => {
                     handleRestart();
@@ -351,14 +357,11 @@ function Interface() {
                   <Restart className="size-6 rotate-180" />
                 </button>
               </div>
-            </div>
 
-            {/*  Leaderboard  */}
-            <div className="flex w-full justify-center items-center">
               <div className="flex flex-col w-full items-center pt-5 max-w-xl h-96 gap-2 bg-[#100D26]/80 backdrop-blur-md rounded-t-3xl">
                 {users ? (
                   <>
-                    {users.slice(0, 5).map((user, index) => {
+                    {users.slice(0, 6).map((user, index) => {
                       return (
                         <div
                           key={index}
@@ -369,15 +372,21 @@ function Interface() {
                           } w-11/12 rounded-lg`}
                         >
                           <div
-                            className={`flex w-full h-12 justify-around items-center gap-4 rounded-lg text-white ${
+                            className={`flex w-full h-12 justify-around items-center gap-4 px-2 rounded-lg text-white ${
                               index < 3
                                 ? "bg-gradient-to-b from-[#352C65] to-[#121130]"
                                 : "bg-[#2D1C46]"
                             } transition-all hover:opacity-95`}
                           >
-                            <p className="flex-1">{index}</p>
+                            <p className="flex-1 text">{index}</p>
                             <p className="flex-grow text-left w-[60%]">
-                              5oKHBsVJyE2vk5rfkbneTzTrjbvJKkcgxpuB7LeAtrve
+                              <span className="max-sm:hidden">
+                                5oKHBsVJyE2vk5rfkbneTzTrjbvJKkcgxpuB7LeAtrve
+                              </span>
+                              {/* Mobile */}
+                              <span className="sm:hidden">
+                                {user.address.slice(0, 16)}...
+                              </span>
                             </p>
                             <p className="flex-1">120</p>
                           </div>
