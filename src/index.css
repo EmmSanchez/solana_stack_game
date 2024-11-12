@@ -31,3 +31,7 @@ html {
     rgba(0, 0, 0, 0.7) 150%
   );
 }
+
+.no-scrollbar {
+  scrollbar-width: none;
+}

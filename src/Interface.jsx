@@ -26,6 +26,7 @@ function Interface() {
   const validating = useGameStore((state) => state.validating);
   const restart = useGameStore((state) => state.restart);
   const home = useGameStore((state) => state.home);
+  const leaderboard = useGameStore((state) => state.leaderboard);
   const perfectCount = useGameStore((state) => state.perfectCount);
 
   const userInfo = useGameStore((state) => state.userInfo);
@@ -45,6 +46,10 @@ function Interface() {
 
   const handleGoToHome = () => {
     home();
+  };
+
+  const handleGoToLeaderboard = () => {
+    leaderboard();
   };
 
   const handleConnectWallet = async () => {
@@ -278,7 +283,13 @@ function Interface() {
                   </button>
                 )}
               </div>
-              <button className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-br from-[#A57FFE] to-[#4E6EFF] transition-all hover:opacity-95">
+              <button
+                onClick={(e) => {
+                  handleGoToLeaderboard();
+                  e.stopPropagation();
+                }}
+                className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-br from-purple-400 to-blue-500 transition-all hover:opacity-95"
+              >
                 <p>Leaderboard</p>
                 <ChartIcon className="size-6" />
               </button>
@@ -287,7 +298,7 @@ function Interface() {
         </div>
       )}
 
-      {mode !== "ready" && mode !== "ended" && (
+      {mode !== "ready" && mode !== "ended" && mode !== "leaderboard" && (
         <div
           onClick={handleCheckResult}
           className="fixed flex justify-center top-0 left-0 size-full text-center hover:cursor-pointer"
@@ -351,17 +362,17 @@ function Interface() {
                     handleRestart();
                     e.stopPropagation();
                   }}
-                  className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-br from-[#A57FFE] to-[#4E6EFF] transition-all hover:opacity-95"
+                  className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-br from-purple-400 to-blue-500 transition-all hover:opacity-95"
                 >
                   <p className="text-xl">Play Again</p>
                   <Restart className="size-6 rotate-180" />
                 </button>
               </div>
 
-              <div className="flex flex-col w-full items-center pt-5 max-w-xl h-96 gap-2 bg-[#100D26]/80 backdrop-blur-md rounded-t-3xl">
+              <div className="flex flex-col w-full items-center pt-5 max-w-xl h-80 gap-2 bg-[#100D26]/80 backdrop-blur-md rounded-t-3xl">
                 {users ? (
                   <>
-                    {users.slice(0, 6).map((user, index) => {
+                    {users.slice(0, 5).map((user, index) => {
                       return (
                         <div
                           key={index}
@@ -375,20 +386,21 @@ function Interface() {
                             className={`flex w-full h-12 justify-around items-center gap-4 px-2 rounded-lg text-white ${
                               index < 3
                                 ? "bg-gradient-to-b from-[#352C65] to-[#121130]"
-                                : "bg-[#2D1C46]"
+                                : "bg-[#564B88]"
                             } transition-all hover:opacity-95`}
                           >
-                            <p className="flex-1 text">{index}</p>
+                            <p className="flex-1 font-medium">{user.rank}</p>
                             <p className="flex-grow text-left w-[60%]">
                               <span className="max-sm:hidden">
-                                5oKHBsVJyE2vk5rfkbneTzTrjbvJKkcgxpuB7LeAtrve
+                                {user.address}
                               </span>
                               {/* Mobile */}
                               <span className="sm:hidden">
-                                {user.address.slice(0, 16)}...
+                                {user.address.slice(0, 10)} ...{" "}
+                                {user.address.slice(-10)}
                               </span>
                             </p>
-                            <p className="flex-1">120</p>
+                            <p className="flex-1">{user.max_score}</p>
                           </div>
                         </div>
                       );
@@ -396,12 +408,118 @@ function Interface() {
                   </>
                 ) : (
                   <>
-                    <p className="text-white">Hello</p>
+                    <p className="text-white">Refresh</p>
                   </>
                 )}
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {mode === "leaderboard" && (
+        <div className="fixed flex flex-col justify-between text-center top-0 left-0 size-full">
+          {/* Hero */}
+          <div className="flex flex-col pt-8 px-8 justify-center items-center">
+            <div className="flex w-full max-w-2xl">
+              <div className="flex items-center w-full justify-between">
+                <div className="flex items-center gap-2 text-gray-200">
+                  <HomeIcon
+                    onClick={(e) => {
+                      handleGoToHome();
+                      e.stopPropagation();
+                    }}
+                    className="size-10 p-2 rounded-md  hover:bg-zinc-900 hover:cursor-pointer"
+                  />
+                  <p className="font-medium">Home</p>
+                </div>
+
+                {/* Solana Price */}
+                <div className="flex items-center gap-4 bg-gradient-to-bl from-neutral-800 to-neutral-950 rounded-md px-4 py-2">
+                  <SolanaIcon className="size-6" />
+                  <p className="text-white">$207.28</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-center items-center mt-4 gap-4 text-xl text-white font-bold">
+              <p>SkyStacks</p>
+              <p className="text-sm px-2 py-1 rounded-full bg-[#66D3FF]">
+                Leaderboard
+              </p>
+            </div>
+          </div>
+
+          {/*  Leaderboard  */}
+          <div className="flex flex-col w-full flex-grow justify-center items-center mt-4">
+            <div className="table flex-col w-full h-full items-center max-w-xl">
+              <div className="flex flex-col w-full h-full items-center py-5 max-w-xl gap-2 bg-[#100D26]/80 backdrop-blur-md rounded-t-3xl border-t-[1px] md:border-l-[1px] md:border-r-[1px] border-solid border-[#647096] overflow-y-auto no-scrollbar">
+                {users ? (
+                  <>
+                    {users.map((user, index) => {
+                      return (
+                        <div
+                          key={index}
+                          className={`${
+                            index < 3
+                              ? "p-[1px] bg-gradient-to-r from-blue-500 to-purple-500"
+                              : ""
+                          } w-11/12 text-sm rounded-lg`}
+                        >
+                          <div
+                            className={`flex w-full h-10 justify-around items-center gap-4 px-2 rounded-lg text-white ${
+                              index < 3
+                                ? "bg-gradient-to-b from-[#352C65] to-[#121130]"
+                                : "bg-[#2F245E]"
+                            } transition-all hover:opacity-95`}
+                          >
+                            <p className="flex-1 font-medium">{user.rank}</p>
+                            <p className="flex-grow text-left w-[60%]">
+                              <span className="max-sm:hidden">
+                                {user.address}
+                              </span>
+                              {/* Mobile */}
+                              <span className="sm:hidden">
+                                {user.address.slice(0, 10)} ...{" "}
+                                {user.address.slice(-10)}
+                              </span>
+                            </p>
+                            <p className="flex-1">{user.max_score}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </>
+                ) : (
+                  <>
+                    <p className="text-white">Refresh</p>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Current User */}
+          {userInfo && userInfo !== "invited" && (
+            <div className="absolute flex justify-center bottom-0 w-full h-14">
+              <div className="absolute bottom-0 w-full max-w-xl h-full px-4 mb-2">
+                <div className="flex justify-center items-center w-full h-full text-white bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
+                  <p className="flex-1 font-bold">{userInfo.rank}</p>
+                  <p className="flex-grow">
+                    <span className="max-sm:hidden text-right">
+                      {userInfo.address}
+                    </span>
+                    {/* Mobile */}
+                    <span className="sm:hidden">
+                      {userInfo.address.slice(0, 10)} ...{" "}
+                      {userInfo.address.slice(-10)}
+                    </span>
+                  </p>
+                  <p className="flex-1 font-bold">{userInfo.max_score}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>

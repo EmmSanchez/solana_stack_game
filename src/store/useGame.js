@@ -19,6 +19,7 @@ const MODES = {
   PLAYING: "playing",
   VALIDATING: "validating",
   ENDED: "ended",
+  LEADERBOARD: "leaderboard",
 };
 
 export const useGameStore = create((set) => {
@@ -94,15 +95,20 @@ export const useGameStore = create((set) => {
     },
     home: () => {
       set((state) => {
-        if (state.mode === "ended") {
-          return {
-            blocks: [INITIAL_BLOCK],
-            speed: INITAL_SPEED,
-            mode: MODES.READY,
-            score: INITAL_SCORE,
-            residual: [],
-          };
-        }
+        return {
+          blocks: [INITIAL_BLOCK],
+          speed: INITAL_SPEED,
+          mode: MODES.READY,
+          score: INITAL_SCORE,
+          residual: [],
+        };
+      });
+    },
+    leaderboard: () => {
+      set((state) => {
+        return {
+          mode: MODES.LEADERBOARD,
+        };
       });
     },
     end: () => {
