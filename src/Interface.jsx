@@ -32,6 +32,8 @@ function Interface() {
   const userInfo = useGameStore((state) => state.userInfo);
   const setUserInfo = useGameStore((state) => state.setUserInfo);
 
+  const [isConnecting, setIsConnecting] = useState(false);
+
   const handleStart = () => {
     start();
   };
@@ -108,6 +110,7 @@ function Interface() {
       }
     };
 
+    setIsConnecting(true);
     try {
       const response = await window.solana.connect();
       const publicKey = response.publicKey.toString();
@@ -129,8 +132,10 @@ function Interface() {
         const res = await registerWallet(publicKey, score);
       }
 
+      setIsConnecting(false);
       return;
     } catch (error) {
+      setIsConnecting(false);
       console.error("Connection to Phantom wallet failed:", error);
     }
   };
@@ -320,6 +325,9 @@ function Interface() {
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
+                  whileHover={{
+                    boxShadow: "0px 0px 10px rgba(0, 255, 255, 0.7)",
+                  }}
                 >
                   {!userInfo || userInfo.address === "invited" ? (
                     <button
@@ -327,10 +335,86 @@ function Interface() {
                         e.stopPropagation();
                         handleConnectWallet();
                       }}
-                      className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-b from-[#352C65] to-[#121130] transition-all hover:opacity-95"
+                      className="flex w-full h-14 text-center justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-b from-[#352C65] to-[#121130] transition-all"
                     >
-                      <p>Connect Wallet</p>
-                      <WalletIcon className="size-6" />
+                      <p className="whitespace-nowrap min-w-28 ">
+                        <AnimatePresence mode="wait">
+                          {isConnecting ? (
+                            <motion.span
+                              key="connecting"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{
+                                duration: 0.2,
+                                ease: "easeOut",
+                              }}
+                            >
+                              Connecting{" "}
+                              <span className="text-xl font-medium tracking-widest">
+                                <motion.span
+                                  className="inline-block"
+                                  animate={{ y: [0, -4, 0] }} // Movimiento hacia arriba y abajo
+                                  transition={{
+                                    repeat: Infinity,
+                                    duration: 0.8,
+                                    delay: 0.2,
+                                  }}
+                                >
+                                  .
+                                </motion.span>
+                                <motion.span
+                                  className="inline-block"
+                                  animate={{ y: [0, -4, 0] }}
+                                  transition={{
+                                    repeat: Infinity,
+                                    duration: 0.8,
+                                    delay: 0.3,
+                                  }}
+                                >
+                                  .
+                                </motion.span>
+                                <motion.span
+                                  className="inline-block"
+                                  animate={{ y: [0, -4, 0] }}
+                                  transition={{
+                                    repeat: Infinity,
+                                    duration: 0.8,
+                                    delay: 0.4,
+                                  }}
+                                >
+                                  .
+                                </motion.span>
+                              </span>
+                            </motion.span>
+                          ) : (
+                            <motion.span
+                              key="connect"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              Connect Wallet
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </p>
+                      <div>
+                        <AnimatePresence mode="popLayout">
+                          {!isConnecting && (
+                            <motion.div
+                              key="walletIcon"
+                              initial={{ opacity: 0, x: 10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: 10 }}
+                              transition={{ duration: 0.3 }}
+                            >
+                              <WalletIcon className="size-6" />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </button>
                   ) : (
                     <button
@@ -338,7 +422,7 @@ function Interface() {
                         e.stopPropagation();
                         handleDisconnectWallet();
                       }}
-                      className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-b from-[#352C65] to-[#121130] transition-all hover:opacity-95"
+                      className="flex w-full h-14 justify-center items-center gap-4 rounded-lg text-white bg-gradient-to-b from-[#352C65] to-[#121130] transition-all"
                     >
                       <p>Disconnect Wallet</p>
                       <LogoutIcon className="size-6" />
@@ -496,11 +580,11 @@ function Interface() {
                               className={`flex w-full h-12 justify-around items-center gap-4 px-2 rounded-lg text-white ${
                                 index < 3
                                   ? "bg-gradient-to-b from-[#352C65] to-[#121130]"
-                                  : "bg-[#2F245E]"
+                                  : "bg-[#2F245E] border-solid border-2 border-gray-600"
                               } ${
                                 user.address === userInfo.address
                                   ? "border-solid border-2 border-teal-500 animate-pulse"
-                                  : "border-solid border-2 border-gray-600"
+                                  : ""
                               } transition-all hover:opacity-95`}
                             >
                               <p className="flex-1 font-medium">{user.rank}</p>
@@ -611,11 +695,11 @@ function Interface() {
                               className={`flex w-full h-10 justify-around items-center gap-4 px-2 rounded-lg text-white ${
                                 index < 3
                                   ? "bg-gradient-to-b from-[#352C65] to-[#121130]"
-                                  : "bg-[#2F245E]"
+                                  : "bg-[#2F245E] border-solid border-2 border-gray-600"
                               } ${
                                 user.address === userInfo.address
                                   ? "bg-yellow-600"
-                                  : "border-solid border-2 border-gray-600"
+                                  : ""
                               } transition-all hover:opacity-95`}
                             >
                               <p className="flex-1 font-medium">{user.rank}</p>
