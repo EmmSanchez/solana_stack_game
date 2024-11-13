@@ -55,7 +55,7 @@ function Interface() {
   const handleConnectWallet = async () => {
     const verifyWallet = async (address) => {
       const res = await fetch(
-        `https://solanastackgameapi-production.up.railway.app/player?id=${address}`,
+        `https://solanastackgameapi-production-b8e7.up.railway.app/player?id=${address}`,
         {
           method: "GET",
           headers: {
@@ -63,9 +63,9 @@ function Interface() {
           },
         }
       );
-      const [data] = await res.json();
+      const data = await res.json();
 
-      if (!data) {
+      if (data.message === "User not found") {
         return null;
       }
 
@@ -73,8 +73,8 @@ function Interface() {
         const index = users.findIndex((user) => user.address === address) + 1;
         const newInfo = {
           rank: index,
-          address: data.address,
-          max_score: data.max_score,
+          address: data[0].address,
+          max_score: data[0].max_score,
         };
         setUserInfo(newInfo);
       }
@@ -84,7 +84,7 @@ function Interface() {
 
     const registerWallet = async (address, score = 0) => {
       const res = await fetch(
-        "https://solanastackgameapi-production.up.railway.app/register",
+        "https://solanastackgameapi-production-b8e7.up.railway.app/register",
         {
           method: "POST",
           headers: {
@@ -149,7 +149,7 @@ function Interface() {
   useEffect(() => {
     const fetchRanking = async () => {
       const res = await fetch(
-        "https://solanastackgameapi-production.up.railway.app/ranking?limit=0&offset=0",
+        "https://solanastackgameapi-production-b8e7.up.railway.app/ranking?limit=0&offset=0",
         {
           method: "GET",
           headers: {
@@ -170,8 +170,8 @@ function Interface() {
   }, []);
 
   const updateMaxScore = async (address, newScore) => {
-    const res = await fetch(
-      "https://solanastackgameapi-production.up.railway.app/player/update-score",
+    await fetch(
+      "https://solanastackgameapi-production-b8e7.up.railway.app/player/update-score",
       {
         method: "PUT",
         headers: {
@@ -183,8 +183,6 @@ function Interface() {
         }),
       }
     );
-
-    const response = await res.json();
   };
 
   useEffect(() => {
