@@ -11,10 +11,7 @@ import {
   WalletIcon,
   XIcon,
 } from "./assets/icons/interfaceIcons";
-import { motion, AnimatePresence, easeIn, easeOut } from "framer-motion";
-// import { Connection, clusterApiUrl, PublicKey } from "@solana/web3.js";
-
-// const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+import { motion, AnimatePresence } from "framer-motion";
 
 function Interface() {
   const [users, setUsers] = useState([]);

@@ -7,7 +7,6 @@ export default defineConfig({
   plugins: [react(), nodePolyfills()],
   resolve: {
     alias: {
-      // Asegúrate de que las dependencias de Node.js sean accesibles
       events: "events",
     },
   },
