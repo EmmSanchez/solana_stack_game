@@ -243,10 +243,12 @@ function Interface() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
                   >
-                    <XIcon
-                      onClick={(e) => e.stopPropagation()}
-                      className="size-10 p-2 rounded-md hover:bg-zinc-900 hover:cursor-pointer"
-                    />
+                    <a href="https://x.com/SkyStacksGame" target="_blank">
+                      <XIcon
+                        onClick={(e) => e.stopPropagation()}
+                        className="size-10 p-2 rounded-md hover:bg-zinc-900 hover:cursor-pointer"
+                      />
+                    </a>
                     <TelegramIcon
                       onClick={(e) => e.stopPropagation()}
                       className="size-10 p-2 rounded-md hover:bg-zinc-900 hover:cursor-pointer"
