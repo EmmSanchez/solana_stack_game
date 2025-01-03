@@ -249,10 +249,12 @@ function Interface() {
                         className="size-10 p-2 rounded-md hover:bg-zinc-900 hover:cursor-pointer"
                       />
                     </a>
-                    <TelegramIcon
-                      onClick={(e) => e.stopPropagation()}
-                      className="size-10 p-2 rounded-md hover:bg-zinc-900 hover:cursor-pointer"
-                    />
+                    <a href="https://t.me/+HVYgus3g4U03YTMx" target="_blank">
+                      <TelegramIcon
+                        onClick={(e) => e.stopPropagation()}
+                        className="size-10 p-2 rounded-md hover:bg-zinc-900 hover:cursor-pointer"
+                      />
+                    </a>
                   </motion.div>
 
                   {/* Solana Price */}
