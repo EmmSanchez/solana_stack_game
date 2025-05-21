@@ -1,8 +1,62 @@
-# React + Vite
+# 🕹️ Solana Stack Game — SkyStacks
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![SkyStacks Main Screenshot](/public/img/stack_game_main.webp)
 
-Currently, two official plugins are available:
+**SkyStacks** is a 3D web-based game built on the **Solana** blockchain. Stack blocks with precision to build the tallest tower and earn crypto rewards. The game blends immersive 3D graphics with real blockchain interaction, offering a fun and rewarding experience.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+> 🔗 [Play now](https://www.skystacksgame.com/)
+
+---
+
+## 🎮 Game Features
+
+- Interactive 3D block-stacking gameplay
+- Solana wallet integration
+- Blockchain-based reward system
+- Smooth animations and responsive design
+- Real-time leaderboard and backend game logic
+
+---
+
+## 🧪 Technologies Used
+
+**Frontend:**
+
+- ⚡ [Vite](https://vitejs.dev/)
+- ⚛️ [React](https://reactjs.org/)
+- 🌐 [Three.js](https://threejs.org/)
+- 🎞️ [Framer Motion](https://www.framer.com/motion/)
+- 💨 [Tailwind CSS](https://tailwindcss.com/)
+- 🧠 [Zustand](https://zustand-demo.pmnd.rs/)
+
+**Backend:**
+
+- 🚂 [Express.js](https://expressjs.com/)
+- 🐘 [PostgreSQL](https://www.postgresql.org/)
+
+---
+
+## 📷 App Mockup
+
+![SkyStacks Mockup](/public/img/stack_game_mockup.webp)
+
+---
+
+## 📂 Repositories
+
+- **Frontend**: [solana_stack_game (GitHub)](https://github.com/EmmSanchez/solana_stack_game)
+- **Backend**: [solana_stack_game_api (GitHub)](https://github.com/EmmSanchez/solana_stack_game_api)
+
+---
+
+## 🚀 Project Status
+
+✅ **Completed** — SkyStacks is live and ready to play.
+
+---
+
+## 📬 Contact
+
+Have suggestions or found a bug? Open an issue or reach out via GitHub.
+
+---
